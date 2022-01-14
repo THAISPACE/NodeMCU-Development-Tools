@@ -1,120 +1,82 @@
-# **NodeMCU 1.5.4.1 final** #
+NodeMCU-Development-Tools ขั้นสุดท้าย
+เข้าร่วมแชทได้ที่ https://gitter.im/nodemcu/nodemcu-firmware สร้างสถานะ สถานะเอกสาร ใบอนุญาต
 
-[![Join the chat at https://gitter.im/nodemcu/nodemcu-firmware](https://img.shields.io/gitter/room/badges/shields.svg)](https://gitter.im/nodemcu/nodemcu-firmware?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/nodemcu/nodemcu-firmware.svg)](https://travis-ci.org/nodemcu/nodemcu-firmware)
-[![Documentation Status](https://img.shields.io/badge/docs-1.5.4.1_final-yellow.svg?style=flat)](http://nodemcu.readthedocs.io/en/1.5.4.1-final/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/nodemcu/nodemcu-firmware/blob/master/LICENSE)
+⛔ แบรนช์นี้ถูกระงับในการคอมมิตครั้งสุดท้ายก่อนที่ Espressif SDK จะได้รับการอัปเกรดเป็น 2.0 ⛔
+เฟิร์มแวร์ที่ใช้ Lua สำหรับ ESP8266 WiFi SOC
+NodeMCUเป็นเฟิร์มแวร์ที่ใช้ eLua สำหรับ ESP8266 WiFi SOC จากEspressif เฟิร์มแวร์ใช้Espressif NON-OS SDK 1.5.4.1และใช้ระบบไฟล์ที่อิงตามspiffs ที่เก็บรหัสประกอบด้วยรหัส C 98.1% ที่ติดแผ่นไม้อัด Lua แบบบางเข้ากับ SDK
 
-## :no_entry: This branch is frozen at the last commit before the Espressif SDK was upgraded to 2.0 :no_entry:
+เฟิร์มแวร์ NodeMCU เป็นโปรเจ็กต์ร่วมกับ NodeMCU dev kitsยอดนิยมบอร์ดพัฒนาโอเพ่นซอร์สสำเร็จรูปพร้อมชิป ESP8266-12E
 
+สรุป
+ง่ายต่อการตั้งโปรแกรมโหนดไร้สายและ/หรือจุดเข้าใช้งาน
+อิงตาม Lua 5.1.4 (ไม่มีการดีบักโมดูลระบบปฏิบัติการ)
+โมเดลการเขียนโปรแกรมที่ขับเคลื่อนด้วยเหตุการณ์แบบอะซิงโครนัส
+40+ โมดูลในตัว
+เฟิร์มแวร์มีหรือไม่มีการสนับสนุนจุดลอยตัว (จำนวนเต็มเท่านั้นใช้หน่วยความจำน้อยกว่า)
+เอกสารฉบับล่าสุดที่https://nodemcu.readthedocs.io
+โมเดลการเขียนโปรแกรม
+โมเดลการเขียนโปรแกรม NodeMCU นั้นคล้ายกับของNode.jsเฉพาะใน Lua เป็นแบบอะซิงโครนัสและขับเคลื่อนด้วยเหตุการณ์ หลายฟังก์ชันจึงมีพารามิเตอร์สำหรับฟังก์ชันเรียกกลับ เพื่อให้คุณมีแนวคิดว่าโปรแกรม NodeMCU เป็นอย่างไร ให้ศึกษาตัวอย่างข้อมูลสั้นๆ ด้านล่าง สำหรับตัวอย่างเพิ่มเติม โปรดดูที่/lua_examplesโฟลเดอร์ในที่เก็บบน GitHub
 
-### A Lua based firmware for ESP8266 WiFi SOC
+--เซิร์ฟเวอร์ HTTP อย่างง่าย 
+srv = net createServer (net. TCP )
+srv: ฟัง ( 80 , ฟังก์ชั่น ( conn )
+	conn: เปิด ( "รับ" , ฟังก์ชั่น ( sck , เพย์ โหลด )
+		 พิมพ์ (เพย์โหลด)
+		sck: send ( " HTTP/1.0 200 OK \r\n Content-Type: text/html \r\n\r\n <h1> สวัสดี NodeMCU</h1> " )
+	 end )
+	conn: เปิด ( "ส่ง" , ฟังก์ชั่น ( sck ) sck: ปิด () end )
+ สิ้นสุด )
+-เชื่อมต่อกับ WiFi access point 
+wifi setmode (wifi. STATION )
+อินเตอร์เน็ตไร้สาย สตา config ( " SSID " , "รหัสผ่าน" )
+เอกสาร
+เอกสาร NodeMCUทั้งหมดถูกเก็บรักษาไว้ในที่เก็บนี้ที่/ docs ความจริงที่ว่าเอกสารประกอบ API ได้รับการดูแลในที่เก็บเดียวกันกับโค้ดที่ให้ API ช่วยให้มั่นใจถึงความสอดคล้องระหว่างทั้งสอง ทุกคอมมิต เอกสารจะถูกสร้างขึ้นใหม่โดย Read the Docs และเปลี่ยนจาก Markdown แบบย่อเป็นไซต์ HTML ที่เรียกดูได้อย่างสวยงามที่https://nodemcu.readthedocs.io
 
-NodeMCU is an [eLua](http://www.eluaproject.net/) based firmware for the [ESP8266 WiFi SOC from Espressif](http://espressif.com/en/products/esp8266/). The firmware is based on the [Espressif NON-OS SDK 1.5.4.1](http://bbs.espressif.com/viewtopic.php?f=46&t=2376) and uses a file system based on [spiffs](https://github.com/pellepl/spiffs). The code repository consists of 98.1% C-code that glues the thin Lua veneer to the SDK.
+วิธีสร้างเฟิร์มแวร์
+วิธีสร้างระบบไฟล์
+วิธีแฟลชเฟิร์มแวร์
+วิธีอัปโหลดโค้ดและ NodeMCU IDEs
+เอกสาร API สำหรับทุกโมดูล
+เผยแพร่
+เนื่องจากจำนวนโมดูลที่เพิ่มขึ้นเรื่อยๆ ภายใน NodeMCU ไบนารีที่สร้างไว้ล่วงหน้าจึงไม่พร้อมใช้งานอีกต่อไป ใช้ บริการสร้างเฟิร์มแวร์แบบกำหนดเองอัตโนมัติเพื่อรับการกำหนดค่าเฟิร์มแวร์เฉพาะที่คุณต้องการ หรือศึกษาเอกสารประกอบสำหรับตัวเลือกอื่นๆ เพื่อสร้างเฟิร์มแวร์ของคุณเอง
 
-The NodeMCU *firmware* is a companion project to the popular [NodeMCU dev kits](https://github.com/nodemcu/nodemcu-devkit-v1.0), ready-made open source development boards with ESP8266-12E chips.
+โครงการนี้ใช้สองสาขาหลักmasterและdev. devกำลังทำงานอย่างแข็งขันและยังเป็นที่ที่ควรสร้างการประชาสัมพันธ์ masterจึงถือได้ว่า "เสถียร" แม้ว่าจะไม่มีการทดสอบการถดถอยอัตโนมัติ เป้าหมายคือการรวมกลับเป็นmasterประมาณทุก 2 เดือน ขึ้นอยู่กับ "ความร้อน" ปัจจุบัน (ปัญหา, PR) เรายอมรับการเปลี่ยนแปลงเป็นdevเวลา 5-6 สัปดาห์ และรอ 2-3 สัปดาห์ก่อนที่สแน็ปถัดไปจะเสร็จสมบูรณ์
 
-# Summary
+แท็กใหม่จะถูกสร้างขึ้นทุกครั้งdevที่รวมกลับmasterเป็น มีการระบุไว้ในส่วนการเผยแพร่ที่นี่บน GitHub ชื่อแท็กเป็นไปตามรูปแบบ <SDK-version>-master_yyyymmdd
 
-- Easy to program wireless node and/or access point
-- Based on Lua 5.1.4 (without *debug, os* modules)
-- Asynchronous event-driven programming model
-- 40+ built-in modules
-- Firmware available with or without floating point support (integer-only uses less memory)
-- Up-to-date documentation at [https://nodemcu.readthedocs.io](https://nodemcu.readthedocs.io)
+สนับสนุน
+ดูhttps://nodemcu.readthedocs.io/en/dev/en/support/ _
 
-# Programming Model
+ใบอนุญาต
+MIT © zeroday / nodemcu.com
 
-The NodeMCU programming model is similar to that of [Node.js](https://en.wikipedia.org/wiki/Node.js), only in Lua. It is asynchronous and event-driven. Many functions, therefore, have parameters for callback functions. To give you an idea what a NodeMCU program looks like study the short snippets below. For more extensive examples have a look at the [`/lua_examples`](lua_examples) folder in the repository on GitHub.
+สร้างตัวเลือก
+ส่วนต่อไปนี้จะอธิบายตัวเลือกบางอย่างที่คุณมี หากคุณต้องการสร้างเฟิร์มแวร์ NodeMCU ของคุณเอง
 
-```lua
--- a simple HTTP server
-srv = net.createServer(net.TCP)
-srv:listen(80, function(conn)
-	conn:on("receive", function(sck, payload)
-		print(payload)
-		sck:send("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<h1> Hello, NodeMCU.</h1>")
-	end)
-	conn:on("sent", function(sck) sck:close() end)
-end)
-```
-```lua
--- connect to WiFi access point
-wifi.setmode(wifi.STATION)
-wifi.sta.config("SSID", "password")
-```
+เลือกโมดูล
+ปิดการใช้งานโมดูลที่คุณจะไม่ได้ใช้เพื่อลดขนาดเฟิร์มแวร์และเพิ่ม RAM บางตัว ESP8266 ค่อนข้างจำกัดใน RAM ที่มีอยู่ และหน่วยความจำไม่เพียงพออาจทำให้ระบบตื่นตระหนก การกำหนดค่าเริ่มต้นได้รับการออกแบบให้ทำงานบนโมดูล ESP ทั้งหมดรวมถึงโมดูล 512 KB เช่น ESP-01 และรวมเฉพาะโมดูลอินเทอร์เฟซสำหรับวัตถุประสงค์ทั่วไปซึ่งต้องใช้พิน GPIO สูงสุดสองตัวเท่านั้น
 
-# Documentation
+แก้ไขapp/include/user_modules.hและแสดงความคิดเห็น#defineคำสั่งสำหรับโมดูลที่คุณไม่ต้องการ ตัวอย่าง:
 
-The entire [NodeMCU documentation](https://nodemcu.readthedocs.io) is maintained right in this repository at [/docs](docs). The fact that the API documentation is mainted in the same repository as the code that *provides* the API ensures consistency between the two. With every commit the documentation is rebuilt by Read the Docs and thus transformed from terse Markdown into a nicely browsable HTML site at [https://nodemcu.readthedocs.io](https://nodemcu.readthedocs.io). 
-
-- How to [build the firmware](https://nodemcu.readthedocs.io/en/dev/en/build/)
-- How to [build the filesystem](https://nodemcu.readthedocs.io/en/dev/en/spiffs/)
-- How to [flash the firmware](https://nodemcu.readthedocs.io/en/dev/en/flash/)
-- How to [upload code and NodeMCU IDEs](https://nodemcu.readthedocs.io/en/dev/en/upload/)
-- API documentation for every module
-
-# Releases
-
-Due to the ever-growing number of modules available within NodeMCU, pre-built binaries are no longer made available. Use the automated [custom firmware build service](http://nodemcu-build.com/) to get the specific firmware configuration you need, or consult the [documentation](http://nodemcu.readthedocs.io/en/dev/en/build/) for other options to build your own firmware.
-
-This project uses two main branches, `master` and `dev`. `dev` is actively worked on and it's also where PRs should be created against. `master` thus can be considered "stable" even though there are no automated regression tests. The goal is to merge back to `master` roughly every 2 months. Depending on the current "heat" (issues, PRs) we accept changes to `dev` for 5-6 weeks and then hold back for 2-3 weeks before the next snap is completed.
-
-A new tag is created every time `dev` is merged back to `master`. They are listed in the [releases section here on GitHub](https://github.com/nodemcu/nodemcu-firmware/releases). Tag names follow the \<SDK-version\>-master_yyyymmdd pattern.
-
-# Support
-
-See [https://nodemcu.readthedocs.io/en/dev/en/support/](https://nodemcu.readthedocs.io/en/dev/en/support/).
-
-# License
-
-[MIT](https://github.com/nodemcu/nodemcu-firmware/blob/master/LICENSE) © [zeroday](https://github.com/NodeMCU)/[nodemcu.com](http://nodemcu.com/index_en.html)
-
-# Build Options
-
-The following sections explain some of the options you have if you want to [build your own NodeMCU firmware](http://nodemcu.readthedocs.io/en/dev/en/build/).
-
-### Select Modules
-
-Disable modules you won't be using to reduce firmware size and free up some RAM. The ESP8266 is quite limited in available RAM and running out of memory can cause a system panic. The default configuration is designed to run on all ESP modules including the 512 KB modules like ESP-01 and only includes general purpose interface modules which require at most two GPIO pins.
-
-Edit `app/include/user_modules.h` and comment-out the `#define` statement for modules you don't need. Example:
-
-```c
 ...
-#define LUA_USE_MODULES_MQTT
-// #define LUA_USE_MODULES_COAP
-// #define LUA_USE_MODULES_U8G
+# กำหนด LUA_USE_MODULES_MQTT 
+// #define LUA_USE_MODULES_COAP 
+// #define LUA_USE_MODULES_U8G 
 ...
-```
+แท็กงานสร้างของคุณ
+ระบุเฟิร์มแวร์ของคุณที่สร้างโดยการแก้ไข app/include/user_version.h
 
-### Tag Your Build
+# กำหนด NODE_VERSION     " NodeMCU 1.5.4.1+ชื่อของฉัน" 
+# ifndef BUILD_DATE
+# กำหนด BUILD_DATE       " YYYYMMDD " 
+# endif
+ตั้งค่าอัตราบิต UART
+อัตราบอดเริ่มต้นที่เวลาบูตคือ 115200bps คุณสามารถเปลี่ยนได้โดยแก้ไขBIT_RATE_DEFAULTในapp/include/user_config.h:
 
-Identify your firmware builds by editing `app/include/user_version.h`
+# กำหนด BIT_RATE_DEFAULT BIT_RATE_115200
+โปรดทราบว่าตามค่าเริ่มต้น เฟิร์มแวร์จะเรียกใช้อัลกอริธึมการตรวจจับการรับส่งข้อมูลอัตโนมัติ ดังนั้นการพิมพ์อักขระสองสามตัวในขณะบู๊ตจะทำให้เฟิร์มแวร์ล็อกไปที่อัตรารับส่งข้อมูลนั้น (ระหว่าง 1200 ถึง 230400)
 
-```c
-#define NODE_VERSION    "NodeMCU 1.5.4.1+myname"
-#ifndef BUILD_DATE
-#define BUILD_DATE      "YYYYMMDD"
-#endif
-```
+แก้จุดบกพร่อง
+เพื่อเปิดใช้งานข้อความดีบักรันไทม์เพื่อแก้ไขคอนโซลอนุกรม app/include/user_config.h
 
-### Set UART Bit Rate
-
-The initial baud rate at boot time is 115200bps. You can change this by
-editing `BIT_RATE_DEFAULT` in `app/include/user_config.h`:
-
-```c
-#define BIT_RATE_DEFAULT BIT_RATE_115200
-```
-
-Note that, by default, the firmware runs an auto-baudrate detection algorithm so that typing a few characters at boot time will cause
-the firmware to lock onto that baud rate (between 1200 and 230400). 
-
-### Debugging
-
-To enable runtime debug messages to serial console edit `app/include/user_config.h`
-
-```c
-#define DEVELOP_VERSION
-```
+# กำหนด DEVELOP_VERSION
